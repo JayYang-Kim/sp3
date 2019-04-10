@@ -61,5 +61,21 @@
     <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
          <property name="transactionManager" ref="transactionManager" />
     </bean>
+    
+    <!-- XML 스키마를 이용한 트랜잭션 처리 -->
+    <!-- 트랜잭션 어드바이스 (tx:advice)를 이용한 선언식 트랜잭션 처리 -->
+    
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    	<tx:attributes>
+    		<tx:method name="insert*" rollback-for="Exception"/>
+    		<tx:method name="update*" rollback-for="Exception"/>
+    		<tx:method name="delete*" rollback-for="Exception"/>
+    	</tx:attributes>
+    </tx:advice>
+    
+    <aop:config proxy-target-class="true">
+    	<aop:pointcut expression="execution(public * com.sp..*Service.*(..))" id="serviceOperation"/>
+    	<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation" id="transactionAdvice"/>
+    </aop:config>
      
 </beans>

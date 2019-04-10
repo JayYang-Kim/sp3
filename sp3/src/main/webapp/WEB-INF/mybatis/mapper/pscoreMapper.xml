@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pscore">
+	<insert id="insertScore" parameterType="com.sp.pscore.Score" statementType="CALLABLE" useGeneratedKeys="false">
+		{
+			call insertScore (
+				#{hak, jdbcType=VARCHAR, mode=IN},
+				#{name, jdbcType=VARCHAR, mode=IN},
+				#{birth, jdbcType=VARCHAR, mode=IN},
+				#{kor, jdbcType=INTEGER, mode=IN},
+				#{eng, jdbcType=INTEGER, mode=IN},
+				#{mat, jdbcType=INTEGER, mode=IN}
+			)
+		}
+	</insert>
+</mapper>

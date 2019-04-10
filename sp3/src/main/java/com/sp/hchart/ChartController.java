@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ChartController {
 	@RequestMapping(value="/hchart/main")
 	public String main() throws Exception {
+		
+		//System.out.println(Integer.parseInt("a"));
+		
 		return "hchart/main";
 	}
 	
