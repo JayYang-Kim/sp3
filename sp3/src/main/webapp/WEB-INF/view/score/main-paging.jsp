@@ -188,10 +188,6 @@ $(function(){
 	});
 });
 
-// 전역 변수
-var pageNo = 1;
-var	totalPage = 1;
-
 // 글 리스트
 $(function(){
 	listPage(1);
@@ -219,15 +215,25 @@ function listPage(page) {
 }
 
 function printScore(data) {
-	totalPage = data.total_page;
-	var dataCount = data.dataCount;
-	var page = data.pageNo;
+	$(".score-list").empty();
+	$(".pagingLayout").empty();
 	
-	if(dataCount == 0) {
-		$(".downloadLayout").hide();
-	}
+	var total_page = data.total_page;
+	var dataCount = data.dataCount;
+	var pageNo = data.pageNo;
+	var paging = data.paging;
 	
 	if(dataCount != 0) {
+		/* for(var idx = 0; idx < data.list.length; idx++) {
+			var hak = data.list[idx].hak;
+			var name = data.list[idx].name;
+			var birth = data.list[idx].birth;
+			var kor = data.list[idx].kor;
+			var eng = data.list[idx].eng;
+			var mat = data.list[idx].mat;
+			var tot = data.list[idx].tot;
+			var ave = data.list[idx].ave;
+		} */
 		$.each(data.list, function(index, value){
 			var hak = value.hak;
 			var name = value.name;
@@ -238,7 +244,7 @@ function printScore(data) {
 			var tot = value.tot;
 			var ave = value.ave;
 			
-			var tr = "<tr height='26' class='row' data-hak='" + hak + "' bgcolor='#ffffff' align='center'></tr>";
+			var tr = "<tr height='26' class='row' data-hak='" + hak + "' data-pageNo='" + pageNo + "' bgcolor='#ffffff' align='center'></tr>";
 			
 			$(tr).
 				hover(function(){
@@ -258,21 +264,7 @@ function printScore(data) {
 					.appendTo(".score-list");
 		});
 		
-		// 페이지 번호 숨김, 표시 처리
-		if(pageNo >= totalPage) {
-			$(".moreLayout").hide();
-		} else {
-			$(".moreLayout").show();
-		}
-	}
-}
-
-function morePage() {
-	if(pageNo < totalPage) {
-		++pageNo;
-		listPage(pageNo);
-	} else {
-		$(".moreLayout").hide();
+		$(".pagingLayout").html(paging);
 	}
 }
 
@@ -282,6 +274,20 @@ $(function(){
 		if(! check()) {
 			return false;
 		}
+		
+		/* var hak = $("#hak").val();
+		var name = $("#name").val();
+		var birth = $("#birth").val();
+		var kor = $("#kor").val();
+		var eng = $("#eng").val();
+		var mat = $("#mat").val();
+		
+		$("input[name=hak]").val(hak).trim();
+		$("input[name=name]").val(name).trim();
+		$("input[name=birth]").val(birth).trim();
+		$("input[name=kor]").val(kor).trim();
+		$("input[name=eng]").val(eng).trim();
+		$("input[name=mat]").val(mat).trim(); */
 		
 		var f = document.scoreForm;
 		f.hak.value = $("#hak").val().trim();
@@ -301,11 +307,13 @@ $(function(){
 			dataType:"json",
 			success : function(data) {
 				if(data.state == "true") {
-					$(".score-list").empty();
-					pageNo = 1;
-					
 					listPage(1);
-	
+					/* $("#hak").val("");
+					$("#name").val("");
+					$("#birth").val("");
+					$("#kor").val("");
+					$("#eng").val("");
+					$("#mat").val(""); */
 					$(".score-input input:text").each(function(){
 						$(this).val("");
 					});
@@ -398,6 +406,7 @@ $(function(){
 	// 수정 완료
 	$("body").on("click", ".spanUpdateOk", function(){
 		var $inputs = $(this).closest("tr").find("input");
+		var pageNo = $(this).closest("tr").attr("data-pageNo");
 		
 		if(!check($inputs)) {
 			return;
@@ -418,12 +427,7 @@ $(function(){
 			dataType:"json",
 			success : function(data) {
 				if(data.state == "true") {
-					$(".score-list").empty();
-					pageNo = 1;
 					listPage(1);
-					/* for(var p = 1; p <= pageNo; p++) {
-						listPage(p)
-					} */
 				} else {
 					alert("수정 실패했습니다.");
 					return false;
@@ -489,6 +493,7 @@ $(function(){
 		if(! confirm("데이터를 삭제 하시겠습니까 ? "))
 			returnscoreForm;
 		
+		var pageNo = $(this).closest("tr").attr("data-pageNo");
 		var hak = $(this).closest("tr").attr("data-hak");
 		
 		var url = "<%=cp%>/score/delete";
@@ -501,9 +506,7 @@ $(function(){
 			dataType:"json",
 			success : function(data) {
 				if(data.state == "true") {
-					$(".score-list").empty();
-					pageNo = 1;
-					listPage(1);
+					listPage(pageNo);
 				} else {
 					alert("삭제 실패했습니다.");
 					return false;
@@ -518,16 +521,6 @@ $(function(){
 		});
 	});
 });
-
-function downloadExcel() {
-	var url = "<%=cp%>/score/excel?page=" + pageNo;
-	location.href = url;
-}
-
-function downloadPdf() {
-	var url = "<%=cp%>/score/pdf?page=" + pageNo;
-	location.href = url;
-}
 </script>
 
 </head>
@@ -574,13 +567,7 @@ function downloadPdf() {
 	</tfoot>
 	</table>
 	
-	<div class="moreLayout" style="text-align: right; height: 50px;">
-		<span onclick="morePage()" style="cursor:pointer">더보기</span>
-	</div>
-	<div class="downloadLayout" style="text-align: left; height: 50px;">
-		<button type="button" onclick="downloadExcel()">엑셀 다운로드</button>
-		<button type="button" onclick="downloadPdf()">PDF 다운로드</button>
-	</div>
+	<div class="pagingLayout" style="text-align: center; height: 50px;"></div>
 	<form name="scoreForm" method="post">
 		<input type="hidden" name="hak">
 		<input type="hidden" name="name">

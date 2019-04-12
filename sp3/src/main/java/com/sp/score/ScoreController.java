@@ -53,13 +53,14 @@ public class ScoreController {
 		
 		List<Score> list = scoreSerivce.listScore(map);
 		
-		String paging = myUtil.pagingMethod(current_page, total_page, "listPage");
+		// more처리 하므로 페이징은 제거
+		//String paging = myUtil.pagingMethod(current_page, total_page, "listPage");
 		
 		model.put("list", list);
 		model.put("dataCount", dataCount);
 		model.put("pageNo", current_page);
 		model.put("total_page", total_page);
-		model.put("paging", paging);
+		//model.put("paging", paging);
 		
 		return model;
 	}
@@ -108,4 +109,6 @@ public class ScoreController {
 		
 		return model;
 	}
+	
+	
 }

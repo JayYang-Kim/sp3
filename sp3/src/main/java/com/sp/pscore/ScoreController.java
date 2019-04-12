@@ -1,5 +1,6 @@
 package com.sp.pscore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.View;
 
+import com.sp.common.MyExcelView;
 import com.sp.common.MyUtil;
 
 @Controller("pscore.scoreController")
@@ -21,6 +24,8 @@ public class ScoreController {
 	private ScoreService scoreService;
 	@Autowired
 	private MyUtil myUtil;
+	@Autowired
+	private MyExcelView myExcelView;
 	
 	@RequestMapping(value="/pscore/list")
 	public String list(@RequestParam(value="page", defaultValue="1") int current_page,
@@ -121,5 +126,73 @@ public class ScoreController {
 		scoreService.deleteScore(hak);
 		
 		return "redirect:/pscore/list?page=" + current_page;
+	}
+	
+	// 엑셀 다운로드 구현
+	@RequestMapping(value="/score/excel")
+	public View excel(@RequestParam(value="page", defaultValue="1") int page,
+			Map<String, Object> model) throws Exception {
+		
+		int rows = 10;
+		Map<String, Object> map = new HashMap<>();
+		map.put("start", 1);
+		map.put("end", page * rows);
+		
+		List<Score> list = scoreService.listScore(map);
+		
+		String sheetName = "성적처리";
+		List<String> columnLabels = new ArrayList<>();
+		List<Object[]> columnValues = new ArrayList<>();
+		
+		columnLabels.add("학번");
+		columnLabels.add("이름");
+		columnLabels.add("생년월일");
+		columnLabels.add("국어");
+		columnLabels.add("영어");
+		columnLabels.add("수학");
+		
+		for(Score dto : list) {
+			columnValues.add(new Object[] {dto.getHak(), dto.getName(), dto.getBirth(), dto.getKor(), dto.getEng(), dto.getMat()});
+		}
+		
+		model.put("fileName", "score.xls");
+		model.put("sheetName", sheetName);
+		model.put("columnLabels", columnLabels);
+		model.put("columnValues", columnValues);
+		
+		return myExcelView;
+	}
+	
+	// PDF 다운로드 구현
+	@RequestMapping(value="/score/pdf")
+	public View pdf(@RequestParam(value="page", defaultValue="1") int page,
+			Map<String, Object> model) throws Exception {
+		
+		int rows = 10;
+		Map<String, Object> map = new HashMap<>();
+		map.put("start", 1);
+		map.put("end", page * rows);
+		
+		List<Score> list = scoreService.listScore(map);
+		
+		List<String> columnLabels = new ArrayList<>();
+		List<String[]> columnValues = new ArrayList<>();
+		
+		columnLabels.add("학번");
+		columnLabels.add("이름");
+		columnLabels.add("생년월일");
+		columnLabels.add("국어");
+		columnLabels.add("영어");
+		columnLabels.add("수학");
+		
+		for(Score dto : list) {
+			columnValues.add(new String[] {dto.getHak(), dto.getName(), dto.getBirth(), dto.getKor()+"", dto.getEng()+"", dto.getMat()+""});
+		}
+		
+		model.put("fileName", "score.pdf");
+		model.put("columnLabels", columnLabels);
+		model.put("columnValues", columnValues);
+		
+		return new ScorePdfView();
 	}
 }
