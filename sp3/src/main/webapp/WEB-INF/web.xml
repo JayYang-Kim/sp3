@@ -3,6 +3,11 @@
 
     <display-name>sp</display-name>
     
+    <error-page>
+    	<error-code>404</error-code>
+    	<location>/error/error404</location>
+    </error-page>
+    
    <!--
 		- Location of the XML file that defines the root application context.
 		- Applied by ContextLoaderListener.

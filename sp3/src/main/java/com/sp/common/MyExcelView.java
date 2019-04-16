@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.document.AbstractXlsView;
 
 // AbstractExcelView : spring 버전 4.2부터는 제거되었으며 AbstractXlsView로 처리
+// AbstractXlsxView : xlsx 버전의 엑셀 파일을 저장할때 상속받는 클래스
 @Service("common.myExcelView")
 public class MyExcelView extends AbstractXlsView {
 

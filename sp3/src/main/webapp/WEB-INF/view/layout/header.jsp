@@ -15,15 +15,15 @@
     </div>
     <div class="header-right">
         <div style="padding-top: 20px;  float: right;">
-            <c:if test="${empty sessionScope.member}">
-                <a href="<%=cp%>/">로그인</a>
+            <c:if test="${empty sessionScope.loginMember.userId}">
+                <a href="<%=cp%>/member/login">로그인</a>
                     &nbsp;|&nbsp;
                 <a href="<%=cp%>/">회원가입</a>
             </c:if>
-            <c:if test="${not empty sessionScope.member}">
-                <span style="color:blue;">${sessionScope.member.userName}</span>님
+            <c:if test="${not empty sessionScope.loginMember.userId}">
+                <span style="color:blue;">${sessionScope.loginMember.userName}</span>님
                     &nbsp;|&nbsp;
-                    <a href="<%=cp%>/">로그아웃</a>
+                    <a href="<%=cp%>/member/logout">로그아웃</a>
                     &nbsp;|&nbsp;
                     <a href="<%=cp%>/">정보수정</a>
             </c:if>
